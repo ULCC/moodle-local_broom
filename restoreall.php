@@ -44,6 +44,9 @@ $PAGE->set_title($SITE->fullname. ': ' . $pagename);
 $PAGE->navbar->add($pluginname, new moodle_url('/local/broom/'));
 $PAGE->navbar->add($pagename);
 
+$directory = required_param('directory', PARAM_SAFEPATH);
+$categoryname = optional_param('categoryname', 'Broom restores', PARAM_TEXT);
+
 require_login();
 require_capability('moodle/site:config', $context);
 if (!debugging('', DEBUG_DEVELOPER)) {
@@ -55,11 +58,10 @@ print $OUTPUT->header();
 print html_writer::tag('h2', get_string('restore'));
 
 $fs = get_file_storage();
-$filelocation = get_config('backup', 'backup_auto_destination');
-if (empty($filelocation)) {
+if (empty($directory)) {
     die('No file location has been configured'); // Should be impossible for people to even see the link to this page.
 }
-$files = glob($filelocation.'/*.mbz');
+$files = glob($directory.'/*.mbz');
 if (empty($files)) {
     print_error('nofiles', 'local_broom'); // TODO is this the right error message?
 }
@@ -74,10 +76,11 @@ foreach ($files as $found) {
     }
     $rand .= rand();
     check_dir_exists($CFG->dataroot . '/temp/backup');
-    $found->extract_to_pathname(get_file_packer(), $CFG->dataroot . '/temp/backup/' . $rand);
+    $packer = get_file_packer();
+    $tempdir = $CFG->dataroot.'/temp/backup/'.$rand;
+    $packer->extract_to_pathname($found, $tempdir);
 
     // Get or create category.
-    $categoryname = 'Broom restores';
     $categoryid = $DB->get_field('course_categories', 'id', array('name'=>$categoryname));
     if (!$categoryid) {
         $categoryid = $DB->insert_record('course_categories', (object)array(
@@ -88,8 +91,18 @@ foreach ($files as $found) {
         $DB->set_field('course_categories', 'path', '/' . $categoryid, array('id'=>$categoryid));
     }
 
-    $shortname = 'BRM' . date('His');
-    $fullname = 'Broom restore ' . date('Y-m-d H:i:s');
+    $backupxml = simplexml_load_file($tempdir.'/moodle_backup.xml');
+
+    if (!empty($backupxml->moodle_backup->information->original_course_shortname)) {
+        $shortname = $backupxml->moodle_backup->information->original_course_shortname;
+    } else {
+        $shortname = 'BRM ' . date('His');
+    }
+    if (!empty($backupxml->moodle_backup->information->original_course_shortname)) {
+        $fullname = $backupxml->moodle_backup->information->original_course_fullname;
+    } else {
+        $fullname = 'Broom restore ' . date('Y-m-d H:i:s');
+    }
 
     // Create new course.
     $courseid = restore_dbops::create_new_course($fullname, $shortname, $categoryid);

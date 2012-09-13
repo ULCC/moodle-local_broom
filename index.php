@@ -25,7 +25,7 @@
 
 require_once('../../config.php');
 
-global $CFG, $SITE, $PAGE, $OUTPUT;
+global $CFG, $SITE, $PAGE, $OUTPUT, $DB;
 
 require_once($CFG->dirroot . '/lib/formslib.php');
 
@@ -61,11 +61,27 @@ print html_writer::tag('div', html_writer::tag('a', get_string('list', 'local_br
     array('href'=>'list.php')));
 
 // Offer the option to restore every file in the automatic backup files folder.
-$filelocation = get_config('backup', 'backup_auto_destination');
-if (!empty($filelocation) && glob($filelocation.'/*.mbk')) {
-    print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackups', 'local_broom'),
-                                                   array('href' => 'restoreall.php')));
-}
+$directoryinput = html_writer::tag('input', '',
+                                   array('type' => 'text',
+                                         'name' => 'directory'));
+$categoryinput = html_writer::tag('input', '',
+                                   array('type' => 'text',
+                                         'name' => 'categoryname'));
+$submitbutton = html_writer::tag('input', '',
+                                 array('type' => 'submit',
+                                       'value' => get_string('restoreallbackups', 'local_broom'),
+                                       'id' => 'd',
+                                       'onclick' => 'document.getElementById("r").disabled=false; '.
+                                           'document.getElementById("d").disabled=true; return true;'));
+$attributes = array('method' => 'post',
+                    'action' => $CFG->wwwroot.'/local/broom/restoreall.php');
+print html_writer::tag('form', $directoryinput.$submitbutton, $attributes);
+
+//$filelocation = get_config('backup', 'backup_auto_destination');
+//if (!empty($filelocation) && glob($filelocation.'/*.mbk')) {
+//    print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackups', 'local_broom'),
+//                                                   array('href' => 'restoreall.php')));
+//}
 
 if (count($files) > 0) {
     print html_writer::start_tag('ul');
