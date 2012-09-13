@@ -93,13 +93,13 @@ foreach ($files as $found) {
 
     $backupxml = simplexml_load_file($tempdir.'/moodle_backup.xml');
 
-    if (!empty($backupxml->moodle_backup->information->original_course_shortname)) {
-        $shortname = $backupxml->moodle_backup->information->original_course_shortname;
+    if (!empty($backupxml->information->original_course_shortname)) {
+        $shortname = $backupxml->information->original_course_shortname;
     } else {
         $shortname = 'BRM ' . date('His');
     }
-    if (!empty($backupxml->moodle_backup->information->original_course_shortname)) {
-        $fullname = $backupxml->moodle_backup->information->original_course_fullname;
+    if (!empty($backupxml->information->original_course_shortname)) {
+        $fullname = $backupxml->information->original_course_fullname;
     } else {
         $fullname = 'Broom restore ' . date('Y-m-d H:i:s');
     }
