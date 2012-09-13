@@ -67,6 +67,7 @@ print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackup
 if (count($files) > 0) {
     print html_writer::start_tag('ul');
     foreach ($files as $file) {
+        /* @var stored_file $file */
         $content = html_writer::tag('div', s($file->get_filename()),
             array('class'=>'local_broom_filename')) .
             html_writer::tag('form', html_writer::tag('input', '',
