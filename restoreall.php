@@ -59,7 +59,7 @@ $filelocation = get_config('backup', 'backup_auto_destination');
 if (empty($filelocation)) {
     die('No file location has been configured'); // Should be impossible for people to even see the link to this page.
 }
-$files = glob($filelocation.'/*.mbk');
+$files = glob($filelocation.'/*.mbz');
 if (empty($files)) {
     print_error('nofiles', 'local_broom'); // TODO is this the right error message?
 }
