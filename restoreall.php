@@ -30,14 +30,12 @@ global $CFG, $PAGE, $SITE, $USER, $DB, $OUTPUT;
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
-$pageparams = array('file'=>$fileid);
-
 $context = context_system::instance();
 
 $pluginname = get_string('pluginname', 'local_broom');
-$pagename = get_string('restore');
+$pagename = get_string('restoreall');
 
-$PAGE->set_url(new moodle_url('/local/createwebsite/', $pageparams));
+$PAGE->set_url(new moodle_url('/local/broom/restoreall.php'));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_heading($SITE->fullname);

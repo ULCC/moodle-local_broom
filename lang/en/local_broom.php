@@ -33,4 +33,6 @@ $string['restoreagain'] = 'Restore again';
 $string['restoredone'] = 'Restore completed';
 $string['acronym'] = '(Backup &amp; Restore Operations On Moodle)';
 $string['restoreallbackups'] = 'Restore all backups from the automatic backups folder';
+$string['restoreall'] = 'Restore all';
+
 
