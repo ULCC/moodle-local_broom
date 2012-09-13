@@ -61,7 +61,7 @@ if (empty($filelocation)) {
 }
 $files = glob($filelocation.'/*.mbk');
 if (empty($files)) {
-    print_error('error', 'local_broom'); // TODO is this the right error message?
+    print_error('nofiles', 'local_broom'); // TODO is this the right error message?
 }
 
 foreach ($files as $found) {
