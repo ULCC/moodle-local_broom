@@ -24,13 +24,16 @@
  */
 
 require_once('../../config.php');
+
+global $CFG, $PAGE, $SITE, $USER, $DB, $OUTPUT;
+
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
 $fileid = required_param('file', PARAM_INT);
 $pageparams = array('file'=>$fileid);
 
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = context_system::instance();
 
 $pluginname = get_string('pluginname', 'local_broom');
 $pagename = get_string('restore');
@@ -56,7 +59,7 @@ print html_writer::tag('h2', get_string('restore'));
 
 $fs = get_file_storage();
 $files = $fs->get_area_files($context->id, 'local_broom', 'backupfiles', 0, 'sortorder', false);
-/** @var stored_file */
+/* @var stored_file $file */
 $found = null;
 foreach ($files as $file) {
     if ($file->get_id() == $fileid) {
@@ -67,7 +70,7 @@ if (!$found) {
     print_error('error', 'local_broom');
 }
 
-// Unzip backup
+// Unzip backup.
 $rand = $USER->id;
 while (strlen($rand) < 10) {
     $rand = '0' . $rand;
@@ -76,7 +79,7 @@ $rand .= rand();
 check_dir_exists($CFG->dataroot . '/temp/backup');
 $found->extract_to_pathname(get_file_packer(), $CFG->dataroot . '/temp/backup/' . $rand);
 
-// Get or create category
+// Get or create category.
 $categoryname = 'Broom restores';
 $categoryid = $DB->get_field('course_categories', 'id', array('name'=>$categoryname));
 if (!$categoryid) {
@@ -91,10 +94,10 @@ if (!$categoryid) {
 $shortname = 'BRM' . date('His');
 $fullname = 'Broom restore ' . date('Y-m-d H:i:s');
 
-// Create new course
+// Create new course.
 $courseid = restore_dbops::create_new_course($fullname, $shortname, $categoryid);
 
-// Restore backup into course
+// Restore backup into course.
 $controller = new restore_controller($rand, $courseid,
         backup::INTERACTIVE_NO, backup::MODE_SAMESITE, $USER->id,
         backup::TARGET_NEW_COURSE);
