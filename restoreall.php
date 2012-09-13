@@ -30,7 +30,6 @@ global $CFG, $PAGE, $SITE, $USER, $DB, $OUTPUT;
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
-$fileid = required_param('file', PARAM_INT);
 $pageparams = array('file'=>$fileid);
 
 $context = context_system::instance();
@@ -58,84 +57,72 @@ print $OUTPUT->header();
 print html_writer::tag('h2', get_string('restore'));
 
 $fs = get_file_storage();
-$files = $fs->get_area_files($context->id, 'local_broom', 'backupfiles', 0, 'sortorder', false);
-/* @var stored_file $file */
-$found = null;
-foreach ($files as $file) {
-    if ($file->get_id() == $fileid) {
-        $found = $file;
+$filelocation = get_config('backup', 'backup_auto_destination');
+if (empty($filelocation)) {
+    die('No file location has been configured'); // Should be impossible for people to even see the link to this page.
+}
+$files = glob($filelocation.'/*.mbk');
+if (empty($files)) {
+    print_error('error', 'local_broom'); // TODO is this the right error message?
+}
+
+foreach ($files as $found) {
+    /* @var stored_file $found */
+
+    // Unzip backup.
+    $rand = $USER->id;
+    while (strlen($rand) < 10) {
+        $rand = '0' . $rand;
     }
-}
-if (!$found) {
-    print_error('error', 'local_broom');
-}
+    $rand .= rand();
+    check_dir_exists($CFG->dataroot . '/temp/backup');
+    $found->extract_to_pathname(get_file_packer(), $CFG->dataroot . '/temp/backup/' . $rand);
 
-// Unzip backup.
-$rand = $USER->id;
-while (strlen($rand) < 10) {
-    $rand = '0' . $rand;
-}
-$rand .= rand();
-check_dir_exists($CFG->dataroot . '/temp/backup');
-$found->extract_to_pathname(get_file_packer(), $CFG->dataroot . '/temp/backup/' . $rand);
+    // Get or create category.
+    $categoryname = 'Broom restores';
+    $categoryid = $DB->get_field('course_categories', 'id', array('name'=>$categoryname));
+    if (!$categoryid) {
+        $categoryid = $DB->insert_record('course_categories', (object)array(
+            'name' => $categoryname,
+            'parent' => 0,
+            'visible' => 0
+        ));
+        $DB->set_field('course_categories', 'path', '/' . $categoryid, array('id'=>$categoryid));
+    }
 
-// Get or create category.
-$categoryname = 'Broom restores';
-$categoryid = $DB->get_field('course_categories', 'id', array('name'=>$categoryname));
-if (!$categoryid) {
-    $categoryid = $DB->insert_record('course_categories', (object)array(
-        'name' => $categoryname,
-        'parent' => 0,
-        'visible' => 0
+    $shortname = 'BRM' . date('His');
+    $fullname = 'Broom restore ' . date('Y-m-d H:i:s');
+
+    // Create new course.
+    $courseid = restore_dbops::create_new_course($fullname, $shortname, $categoryid);
+
+    // Restore backup into course.
+    $controller = new restore_controller($rand, $courseid,
+            backup::INTERACTIVE_NO, backup::MODE_SAMESITE, $USER->id,
+            backup::TARGET_NEW_COURSE);
+    /* @var base_logger $logger */
+    $logger = $controller->get_logger();
+    $logger->set_next(new output_indented_logger(backup::LOG_INFO, false, true));
+    $controller->execute_precheck();
+    $controller->execute_plan();
+
+    // Set shortname and fullname back!
+    $DB->update_record('course', (object)array(
+        'id' => $courseid,
+        'shortname' => $shortname,
+        'fullname' => $fullname
     ));
-    $DB->set_field('course_categories', 'path', '/' . $categoryid, array('id'=>$categoryid));
+
+    print html_writer::tag('p', get_string('restoredone', 'local_broom'));
+
+    $courseurl = new moodle_url('/course/view.php', array('id'=>$courseid));
+    print html_writer::tag('p', html_writer::tag('a',
+            get_string('viewcourse', 'local_broom'),
+            array('href'=>$courseurl->out(), 'target'=>'_blank')));
+
+
 }
 
-$shortname = 'BRM' . date('His');
-$fullname = 'Broom restore ' . date('Y-m-d H:i:s');
-
-// Create new course.
-$courseid = restore_dbops::create_new_course($fullname, $shortname, $categoryid);
-
-// Restore backup into course.
-$controller = new restore_controller($rand, $courseid,
-        backup::INTERACTIVE_NO, backup::MODE_SAMESITE, $USER->id,
-        backup::TARGET_NEW_COURSE);
-$controller->get_logger()->set_next(new output_indented_logger(backup::LOG_INFO, false, true));
-$controller->execute_precheck();
-$controller->execute_plan();
-
-// Set shortname and fullname back!
-$DB->update_record('course', (object)array(
-    'id' => $courseid,
-    'shortname' => $shortname,
-    'fullname' => $fullname
-));
-
-print html_writer::tag('p', get_string('restoredone', 'local_broom'));
-
-$courseurl = new moodle_url('/course/view.php', array('id'=>$courseid));
-print html_writer::tag('p', html_writer::tag('a',
-        get_string('viewcourse', 'local_broom'),
-        array('href'=>$courseurl->out(), 'target'=>'_blank')));
-
-$hash = md5($DB->get_field('course', 'timemodified', array('id'=>$courseid)));
-$deleteurl = new moodle_url('/course/delete.php');
-print html_writer::tag('form', html_writer::tag('input', '',
-        array('type'=>'submit', 'value'=>get_string('deletecourse', 'local_broom'), 'id'=>'d',
-            'onclick'=>'document.getElementById("r").disabled=false; ' .
-                'document.getElementById("d").disabled=true; return true;')) .
-        html_writer::tag('input', '', array('type'=>'hidden', 'name'=>'id', 'value'=>$courseid)) .
-        html_writer::tag('input', '', array('type'=>'hidden', 'name'=>'sesskey', 'value'=>sesskey())) .
-        html_writer::tag('input', '', array('type'=>'hidden', 'name'=>'delete', 'value'=>$hash)),
-        array('action'=>$deleteurl->out(), 'method'=>'post', 'target'=>'_blank'));
-
-print html_writer::tag('form', html_writer::tag('input', '',
-        array('type'=>'submit', 'value'=>get_string('restoreagain', 'local_broom'),
-            'id'=>'r')) .
-        html_writer::tag('input', '', array('type'=>'hidden', 'name'=>'file',
-            'value'=>$file->get_id())),
-        array('action'=>'restore.php', 'method'=>'post'));
 
 print html_writer::tag('script', 'document.getElementById("r").disabled=true;',
         array('type'=>'text/javascript'));
