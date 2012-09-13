@@ -104,6 +104,12 @@ foreach ($files as $found) {
         $fullname = 'Broom restore ' . date('Y-m-d H:i:s');
     }
 
+    // Skip if courseshortname is already here as we have to have unique ones.
+    if ($DB->record_exists('course', array('shortname' => $shortname))) {
+        print html_writer::tag('p', get_string('courseexists', 'local_broom', $shortname));
+        continue;
+    }
+
     // Create new course.
     $courseid = restore_dbops::create_new_course($fullname, $shortname, $categoryid);
 

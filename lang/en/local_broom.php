@@ -36,6 +36,8 @@ $string['acronym'] = '(Backup &amp; Restore Operations On Moodle)';
 $string['restoreallbackups'] = 'Restore all backups from the automatic backups folder';
 $string['restoreall'] = 'Restore all';
 $string['nofiles'] = 'No automatic backup files found';
+$string['courseexists'] = 'Course with shortname {$a} already exists!';
+
 
 
 
