@@ -24,11 +24,14 @@
  */
 
 require_once('../../config.php');
+
+global $CFG, $SITE, $PAGE, $OUTPUT;
+
 require_once($CFG->dirroot . '/lib/formslib.php');
 
 $pageparams = array();
 
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = context_system::instance();
 
 $pluginname = get_string('pluginname', 'local_broom');
 
