@@ -128,7 +128,7 @@ foreach ($files as $found) {
 
     $courseurl = new moodle_url('/course/view.php', array('id'=>$courseid));
     print html_writer::tag('p', html_writer::tag('a',
-            get_string('viewcourse', 'local_broom'),
+            get_string('viewcoursenamed', 'local_broom', $fullname),
             array('href'=>$courseurl->out(), 'target'=>'_blank')));
 
 

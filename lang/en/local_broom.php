@@ -28,6 +28,7 @@ $string['list'] = 'Edit list of Broom backups';
 $string['backupfiles'] = 'Backup files';
 $string['error'] = 'An error occurred';
 $string['viewcourse'] = 'View course (new window)';
+$string['viewcoursenamed'] = 'View {$a} (new window)';
 $string['deletecourse'] = 'Delete course (new window)';
 $string['restoreagain'] = 'Restore again';
 $string['restoredone'] = 'Restore completed';
