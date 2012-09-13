@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 $context = context_system::instance();
 
 $pluginname = get_string('pluginname', 'local_broom');
-$pagename = get_string('restoreall');
+$pagename = get_string('restoreall', 'local_broom');
 
 $PAGE->set_url(new moodle_url('/local/broom/restoreall.php'));
 $PAGE->set_context($context);
