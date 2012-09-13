@@ -60,6 +60,10 @@ $files = $fs->get_area_files($context->id, 'local_broom', 'backupfiles', 0, 'sor
 print html_writer::tag('div', html_writer::tag('a', get_string('list', 'local_broom'),
     array('href'=>'list.php')));
 
+// Offer the option to restore every file in the automatic backup files folder.
+print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackups', 'local_broom'),
+                                               array('href' => 'restoreall.php')));
+
 if (count($files) > 0) {
     print html_writer::start_tag('ul');
     foreach ($files as $file) {
