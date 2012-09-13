@@ -61,8 +61,11 @@ print html_writer::tag('div', html_writer::tag('a', get_string('list', 'local_br
     array('href'=>'list.php')));
 
 // Offer the option to restore every file in the automatic backup files folder.
-print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackups', 'local_broom'),
-                                               array('href' => 'restoreall.php')));
+$filelocation = get_config('backup', 'backup_auto_destination');
+if (!empty($filelocation)) {
+    print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackups', 'local_broom'),
+                                                   array('href' => 'restoreall.php')));
+}
 
 if (count($files) > 0) {
     print html_writer::start_tag('ul');
