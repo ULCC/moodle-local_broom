@@ -61,10 +61,10 @@ print html_writer::tag('div', html_writer::tag('a', get_string('list', 'local_br
     array('href'=>'list.php')));
 
 // Offer the option to restore every file in the automatic backup files folder.
-$directoryinput = html_writer::tag('input', '',
+$directoryinput = html_writer::tag('input', get_string('directory'),
                                    array('type' => 'text',
                                          'name' => 'directory'));
-$categoryinput = html_writer::tag('input', '',
+$categoryinput = html_writer::tag('input', get_string('category'),
                                    array('type' => 'text',
                                          'name' => 'categoryname'));
 $submitbutton = html_writer::tag('input', '',
@@ -73,9 +73,11 @@ $submitbutton = html_writer::tag('input', '',
                                        'id' => 'd',
                                        'onclick' => 'document.getElementById("r").disabled=false; '.
                                            'document.getElementById("d").disabled=true; return true;'));
+$linebreak = html_writer::empty_tag('br');
 $attributes = array('method' => 'post',
                     'action' => $CFG->wwwroot.'/local/broom/restoreall.php');
-print html_writer::tag('form', $directoryinput.$submitbutton, $attributes);
+$contents = $directoryinput.$linebreak.$linebreak.$categoryinput.$linebreak.$submitbutton;
+print html_writer::tag('form', $contents, $attributes);
 
 //$filelocation = get_config('backup', 'backup_auto_destination');
 //if (!empty($filelocation) && glob($filelocation.'/*.mbk')) {
