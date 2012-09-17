@@ -37,6 +37,7 @@ $string['restoreallbackups'] = 'Restore all backups from the automatic backups f
 $string['restoreall'] = 'Restore all';
 $string['nofiles'] = 'No files found in this directory';
 $string['courseexists'] = 'Course with shortname "{$a}" already exists!';
+$string['suffix'] = 'Suffix to add to shortname in case of duplicates';
 
 
 

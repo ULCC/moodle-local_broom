@@ -67,6 +67,9 @@ $directoryinput = html_writer::tag('input', get_string('directory'),
 $categoryinput = html_writer::tag('input', get_string('category'),
                                    array('type' => 'text',
                                          'name' => 'categoryname'));
+$suffixinput = html_writer::tag('input', get_string('suffix', 'local_broom'),
+                                  array('type' => 'text',
+                                        'name' => 'categoryname'));
 $submitbutton = html_writer::tag('input', '',
                                  array('type' => 'submit',
                                        'value' => get_string('restoreallbackups', 'local_broom'),
@@ -76,7 +79,7 @@ $submitbutton = html_writer::tag('input', '',
 $linebreak = html_writer::empty_tag('br');
 $attributes = array('method' => 'post',
                     'action' => $CFG->wwwroot.'/local/broom/restoreall.php');
-$contents = $directoryinput.$linebreak.$linebreak.$categoryinput.$linebreak.$submitbutton;
+$contents = $directoryinput.$linebreak.$linebreak.$categoryinput.$linebreak.$suffixinput.$linebreak.$submitbutton;
 print html_writer::tag('form', $contents, $attributes);
 
 //$filelocation = get_config('backup', 'backup_auto_destination');

@@ -46,6 +46,7 @@ $PAGE->navbar->add($pagename);
 
 $directory = required_param('directory', PARAM_SAFEPATH);
 $categoryname = optional_param('categoryname', 'Broom restores', PARAM_TEXT);
+$suffix = optional_param('suffix', '', PARAM_TEXT);
 
 require_login();
 require_capability('moodle/site:config', $context);
@@ -106,8 +107,13 @@ foreach ($files as $found) {
 
     // Skip if courseshortname is already here as we have to have unique ones.
     if ($DB->record_exists('course', array('shortname' => $shortname))) {
-        print html_writer::tag('p', get_string('courseexists', 'local_broom', $shortname));
-        continue;
+
+        if (!empty($suffix)) {
+            $shortname .= $suffix;
+        } else {
+            print html_writer::tag('p', get_string('courseexists', 'local_broom', $shortname));
+            continue;
+        }
     }
 
     // Create new course.
