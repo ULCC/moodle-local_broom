@@ -126,7 +126,15 @@ foreach ($files as $found) {
     /* @var base_logger $logger */
     $logger = $controller->get_logger();
     $logger->set_next(new output_indented_logger(backup::LOG_INFO, false, true));
-    $controller->execute_precheck();
+    if (!$controller->execute_precheck()) {
+        // Errors of some sort.
+        echo get_string('somethingwentwrong', 'local_broom', $shortname);
+        $errors = $controller->get_precheck_results();
+        foreach ($errors as $error) {
+            echo $error.html_writer::empty_tag('br');
+        }
+        continue;
+    }
     $controller->execute_plan();
 
     // Set shortname and fullname back!

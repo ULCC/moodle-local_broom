@@ -38,6 +38,7 @@ $string['restoreall'] = 'Restore all';
 $string['nofiles'] = 'No files found in this directory';
 $string['courseexists'] = 'Course with shortname "{$a}" already exists!';
 $string['suffix'] = 'Suffix to add to shortname in case of duplicates';
+$string['somethingwentwrong'] = 'Something went wrong when doing the pre restroe check for {$a}';
 
 
 
