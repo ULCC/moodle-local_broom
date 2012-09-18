@@ -82,12 +82,6 @@ $attributes = array('method' => 'post',
 $contents = $directoryinput.$linebreak.$linebreak.$categoryinput.$linebreak.$suffixinput.$linebreak.$submitbutton;
 print html_writer::tag('form', $contents, $attributes);
 
-//$filelocation = get_config('backup', 'backup_auto_destination');
-//if (!empty($filelocation) && glob($filelocation.'/*.mbk')) {
-//    print html_writer::tag('div', html_writer::tag('a', get_string('restoreallbackups', 'local_broom'),
-//                                                   array('href' => 'restoreall.php')));
-//}
-
 if (count($files) > 0) {
     print html_writer::start_tag('ul');
     foreach ($files as $file) {
