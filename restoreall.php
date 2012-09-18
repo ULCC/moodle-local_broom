@@ -133,6 +133,7 @@ foreach ($files as $found) {
         foreach ($errors as $error) {
             echo $error.html_writer::empty_tag('br');
         }
+        $DB->delete_records('course', array('id' => $courseid));
         continue;
     }
     $controller->execute_plan();
