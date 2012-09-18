@@ -131,7 +131,7 @@ foreach ($files as $found) {
         echo get_string('somethingwentwrong', 'local_broom', $shortname);
         $errors = $controller->get_precheck_results();
         foreach ($errors as $error) {
-            echo $error.html_writer::empty_tag('br');
+            print_r($error.html_writer::empty_tag('br'));
         }
         $DB->delete_records('course', array('id' => $courseid));
         continue;
